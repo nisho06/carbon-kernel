@@ -1,7 +1,6 @@
 package org.wso2.carbon.user.core.hash;
 // TODO: 03/02/2021 add liscense 
 
-import org.wso2.carbon.user.core.UserStoreException;
 import org.wso2.carbon.user.core.exceptions.HashCalculatorException;
 
 import java.io.UnsupportedEncodingException;
