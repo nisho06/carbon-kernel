@@ -21,12 +21,17 @@ package org.wso2.carbon.user.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.crypto.api.CryptoService;
+import org.wso2.carbon.user.core.hash.HashCalculator;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class UserStoreMgtDataHolder {
 
     private static UserStoreMgtDataHolder instance = new UserStoreMgtDataHolder();
     private static final Log log = LogFactory.getLog(UserStoreMgtDataHolder.class);
     private CryptoService cryptoService;
+    private Map<String,HashCalculator> hashCalculatorMap;
 
     public static UserStoreMgtDataHolder getInstance() {
 
@@ -46,5 +51,27 @@ public class UserStoreMgtDataHolder {
 
         return cryptoService;
     }
+
+    public void setHashCalculator(HashCalculator hashCalculator) {
+
+        if (hashCalculatorMap == null) {
+            hashCalculatorMap = new HashMap<>();
+            hashCalculatorMap.put(hashCalculator.getAlgorithm(),hashCalculator);
+        } else {
+            hashCalculatorMap.put(hashCalculator.getAlgorithm(), hashCalculator);
+        }
+    }
+
+    public HashCalculator getHashCalculator(String algorithm) {
+
+        HashCalculator hashCalculator = hashCalculatorMap.get(algorithm);
+        return hashCalculator;
+    }
+
+    public void unbindHashCalculator(HashCalculator hashCalculator){
+        hashCalculatorMap.remove(hashCalculator.getAlgorithm());
+    }
+
+
 
 }

@@ -43,6 +43,7 @@ import org.wso2.carbon.user.core.ldap.UniqueIDActiveDirectoryUserStoreManager;
 import org.wso2.carbon.user.core.ldap.UniqueIDReadOnlyLDAPUserStoreManager;
 import org.wso2.carbon.user.core.ldap.UniqueIDReadWriteLDAPUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
+import org.wso2.carbon.user.core.hash.HashCalculator;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.user.core.claim.ClaimManagerFactory;
@@ -62,7 +63,7 @@ public class UserStoreMgtDSComponent {
         return realmService;
     }
 
-    @Reference(name = "user.realmservice.default", cardinality = ReferenceCardinality.MANDATORY, 
+    @Reference(name = "user.realmservice.default", cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC, unbind = "unsetRealmService")
     protected void setRealmService(RealmService rlmService) {
         realmService = rlmService;
@@ -72,10 +73,27 @@ public class UserStoreMgtDSComponent {
         return UserStoreMgtDSComponent.serverConfigurationService;
     }
 
-    @Reference(name = "server.configuration.service", cardinality = ReferenceCardinality.MANDATORY, 
+    @Reference(name = "server.configuration.service", cardinality = ReferenceCardinality.MANDATORY,
             policy = ReferencePolicy.DYNAMIC, unbind = "unsetServerConfigurationService")
     protected void setServerConfigurationService(ServerConfigurationService serverConfigurationService) {
         UserStoreMgtDSComponent.serverConfigurationService = serverConfigurationService;
+    }
+
+    @Reference(
+            name = "hash.calculator.component",
+            service = org.wso2.carbon.user.core.hash.HashCalculator.class,
+            cardinality = ReferenceCardinality.MULTIPLE,
+            policy = ReferencePolicy.DYNAMIC,
+            unbind = "unsetHashCalculator"
+    )
+    protected void setHashCalculator(HashCalculator hashCalculator) {
+
+        userStoreMgtDataHolder.setHashCalculator(hashCalculator);
+    }
+
+    protected void unsetHashCalculator(HashCalculator hashCalculator) {
+
+        userStoreMgtDataHolder.unbindHashCalculator(hashCalculator);
     }
 
     @Activate
@@ -145,7 +163,7 @@ public class UserStoreMgtDSComponent {
         return UserStoreMgtDSComponent.claimManagerFactory;
     }
 
-    @Reference(name = "claim.mgt.component", cardinality = ReferenceCardinality.OPTIONAL, 
+    @Reference(name = "claim.mgt.component", cardinality = ReferenceCardinality.OPTIONAL,
             policy = ReferencePolicy.DYNAMIC, unbind = "unsetClaimManagerFactory")
     protected void setClaimManagerFactory(ClaimManagerFactory claimManagerFactory) {
         this.claimManagerFactory = claimManagerFactory;
