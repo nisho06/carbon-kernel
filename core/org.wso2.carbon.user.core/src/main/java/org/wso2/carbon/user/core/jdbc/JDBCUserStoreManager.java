@@ -38,8 +38,8 @@ import org.wso2.carbon.user.core.common.RoleBreakdown;
 import org.wso2.carbon.user.core.common.RoleContext;
 import org.wso2.carbon.user.core.constants.UserCoreErrorConstants;
 import org.wso2.carbon.user.core.dto.RoleDTO;
-import org.wso2.carbon.user.core.exceptions.HashCalculatorException;
-import org.wso2.carbon.user.core.hash.HashCalculator;
+import org.wso2.carbon.user.core.exceptions.HashProviderException;
+import org.wso2.carbon.user.core.hash.HashProvider;
 import org.wso2.carbon.user.core.hybrid.HybridJDBCConstants;
 import org.wso2.carbon.user.core.internal.UserStoreMgtDataHolder;
 import org.wso2.carbon.user.core.jdbc.caseinsensitive.JDBCCaseInsensitiveConstants;
@@ -2787,17 +2787,17 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager {
     }
 
     /**
-     * Prepare the password including the salt, and hashes if hash algorithm is provided
+     * Prepare the password including the salt, and hashes if hash algorithm is provided.
      *
-     * @param password original password value
+     * @param password original password value which needs to be hashed
      * @param saltValue salt value
      * @return  hashed password or plain text password as a String
-     * @throws UserStoreException
+     * @throws UserStoreException The exception thrown at hashing the passwords.
      */
     protected String preparePassword(Object password, String saltValue) throws UserStoreException {
 
         Secret credentialObj;
-        String passwordHash = new String();
+        String passwordHash = "";
         try {
             credentialObj = Secret.getSecret(password);
         } catch (UnsupportedSecretTypeException e) {
@@ -2825,31 +2825,28 @@ public class JDBCUserStoreManager extends AbstractUserStoreManager {
                     }
                     throw new UserStoreException(msg, e);
                 }
-
-            } else if (digestFunction.equals("PBKDF2WithHmacSHA256")) {
+            } else if (digestFunction.equals("PBKDF2")) {
                 String passwordString = String.valueOf(credentialObj.getChars());
-                Map<String, Object> metaProperties = new HashMap<String, Object>();
+                Map<String, Object> metaProperties = new HashMap<>();
                 metaProperties.put("iterations", 10000);
                 metaProperties.put("dkLength", 256);
-                HashCalculator hashCalculator = UserStoreMgtDataHolder.getInstance().getHashCalculator(
-                        "PBKDF2WithHmacSHA256");
+                metaProperties.put("PRF", "PBKDF2WithHmacSHA256");
+                HashProvider hashProvider = UserStoreMgtDataHolder.getInstance().getHashProvider(
+                        "PBKDF2");
                 try {
-                    passwordHash = hashCalculator.calculateHash(passwordString, saltValue, metaProperties);
-                } catch (HashCalculatorException e) {
+                    byte[] hashByteArray = hashProvider.getHash(passwordString, saltValue, metaProperties);
+                    passwordHash = Base64.encode(hashByteArray);
+                } catch (HashProviderException e) {
                     String msg = "Error in pbkdf2 hashing.";
                     if (log.isDebugEnabled()) {
                         log.debug(msg, e);
                     }
                 }
-
             }
         } else {
             passwordHash = new String(credentialObj.getChars());
         }
         return passwordHash;
-        /*finally {
-            credentialObj.clear();
-        }*/
     }
 
     /**

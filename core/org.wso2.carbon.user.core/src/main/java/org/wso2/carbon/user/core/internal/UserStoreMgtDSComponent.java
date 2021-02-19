@@ -34,6 +34,7 @@ import org.wso2.carbon.user.api.RealmConfiguration;
 import org.wso2.carbon.user.api.UserStoreManager;
 import org.wso2.carbon.user.core.UserStoreConfigConstants;
 import org.wso2.carbon.user.core.claim.ClaimManager;
+import org.wso2.carbon.user.core.hash.HashProvider;
 import org.wso2.carbon.user.core.jdbc.JDBCUserStoreManager;
 import org.wso2.carbon.user.core.jdbc.UniqueIDJDBCUserStoreManager;
 import org.wso2.carbon.user.core.ldap.ActiveDirectoryUserStoreManager;
@@ -43,7 +44,6 @@ import org.wso2.carbon.user.core.ldap.UniqueIDActiveDirectoryUserStoreManager;
 import org.wso2.carbon.user.core.ldap.UniqueIDReadOnlyLDAPUserStoreManager;
 import org.wso2.carbon.user.core.ldap.UniqueIDReadWriteLDAPUserStoreManager;
 import org.wso2.carbon.user.core.service.RealmService;
-import org.wso2.carbon.user.core.hash.HashCalculator;
 import org.wso2.carbon.user.core.tracker.UserStoreManagerRegistry;
 import org.wso2.carbon.utils.multitenancy.MultitenantConstants;
 import org.wso2.carbon.user.core.claim.ClaimManagerFactory;
@@ -80,20 +80,20 @@ public class UserStoreMgtDSComponent {
     }
 
     @Reference(
-            name = "hash.calculator.component",
-            service = org.wso2.carbon.user.core.hash.HashCalculator.class,
+            name = "hash.provider.component",
+            service = org.wso2.carbon.user.core.hash.HashProvider.class,
             cardinality = ReferenceCardinality.MULTIPLE,
             policy = ReferencePolicy.DYNAMIC,
-            unbind = "unsetHashCalculator"
+            unbind = "unsetHashProvider"
     )
-    protected void setHashCalculator(HashCalculator hashCalculator) {
+    protected void setHashProvider(HashProvider hashProvider) {
 
-        userStoreMgtDataHolder.setHashCalculator(hashCalculator);
+        userStoreMgtDataHolder.setHashProvider(hashProvider);
     }
 
-    protected void unsetHashCalculator(HashCalculator hashCalculator) {
+    protected void unsetHashProvider(HashProvider hashProvider) {
 
-        userStoreMgtDataHolder.unbindHashCalculator(hashCalculator);
+        userStoreMgtDataHolder.unbindHashProvider(hashProvider);
     }
 
     @Activate

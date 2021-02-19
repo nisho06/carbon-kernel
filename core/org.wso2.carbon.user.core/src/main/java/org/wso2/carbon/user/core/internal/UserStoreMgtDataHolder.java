@@ -21,7 +21,7 @@ package org.wso2.carbon.user.core.internal;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.wso2.carbon.crypto.api.CryptoService;
-import org.wso2.carbon.user.core.hash.HashCalculator;
+import org.wso2.carbon.user.core.hash.HashProvider;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -31,7 +31,7 @@ public class UserStoreMgtDataHolder {
     private static UserStoreMgtDataHolder instance = new UserStoreMgtDataHolder();
     private static final Log log = LogFactory.getLog(UserStoreMgtDataHolder.class);
     private CryptoService cryptoService;
-    private Map<String,HashCalculator> hashCalculatorMap;
+    private Map<String, HashProvider> hashProviderMap;
 
     public static UserStoreMgtDataHolder getInstance() {
 
@@ -52,24 +52,24 @@ public class UserStoreMgtDataHolder {
         return cryptoService;
     }
 
-    public void setHashCalculator(HashCalculator hashCalculator) {
+    public void setHashProvider(HashProvider hashProvider) {
 
-        if (hashCalculatorMap == null) {
-            hashCalculatorMap = new HashMap<>();
-            hashCalculatorMap.put(hashCalculator.getAlgorithm(),hashCalculator);
+        if (hashProviderMap == null) {
+            hashProviderMap = new HashMap<>();
+            hashProviderMap.put(hashProvider.getAlgorithm(), hashProvider);
         } else {
-            hashCalculatorMap.put(hashCalculator.getAlgorithm(), hashCalculator);
+            hashProviderMap.put(hashProvider.getAlgorithm(), hashProvider);
         }
     }
 
-    public HashCalculator getHashCalculator(String algorithm) {
+    public HashProvider getHashProvider(String algorithm) {
 
-        HashCalculator hashCalculator = hashCalculatorMap.get(algorithm);
-        return hashCalculator;
+        return hashProviderMap.get(algorithm);
+
     }
 
-    public void unbindHashCalculator(HashCalculator hashCalculator){
-        hashCalculatorMap.remove(hashCalculator.getAlgorithm());
+    public void unbindHashProvider(HashProvider hashProvider) {
+        hashProviderMap.remove(hashProvider.getAlgorithm());
     }
 
 

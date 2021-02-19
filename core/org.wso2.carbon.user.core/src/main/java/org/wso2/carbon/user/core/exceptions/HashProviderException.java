@@ -18,28 +18,34 @@
 
 package org.wso2.carbon.user.core.exceptions;
 
-public class HashCalculatorException extends Exception {
+/**
+ * The exception is thrown when there is a problem with HashProvider service.
+ */
+public class HashProviderException extends Exception {
 
     private static final long serialVersionUID = -6057036683816666355L;
     private String errorCode;
 
-    public HashCalculatorException() {
+    public HashProviderException() {
+
         super();
     }
 
-    public HashCalculatorException(String message, Throwable cause) {
+    public HashProviderException(String message, Throwable cause) {
+
         super(message, cause);
     }
 
-    public HashCalculatorException(String message, String errorCode,  Throwable cause) {
+    public HashProviderException(String message, String errorCode, Throwable cause) {
+
         super(message, cause);
         this.errorCode = errorCode;
     }
 
-    public HashCalculatorException(String message, String errorCode) {
+    public HashProviderException(String message, String errorCode) {
+
         super(message);
         this.errorCode = errorCode;
     }
-
 
 }
